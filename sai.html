@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSakha - AI Farming Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2E7D32;
+            --primary-light: #4CAF50;
+            --primary-dark: #1B5E20;
+            --secondary: #FFC107;
+            --accent: #2196F3;
+            --light: #E8F5E9;
+            --white: #FFFFFF;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9f0, #e0f2e1);
+            color: #333;
+            min-height: 100vh;
+            padding-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: var(--white);
+            padding: 1.2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            background: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon i {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .logo-text h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            color: #e0f7fa;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .lang-btn.active {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin: 1.8rem 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            background: var(--white);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(46, 125, 50, 0.1);
+        }
+
+        .nav-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+        }
+
+        /* Content Styles */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .content-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .section-title {
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-light);
+            display: inline-block;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, var(--light), var(--white));
+            padding: 1.5rem;
+            border-radius: 14px;
+            border-left: 4px solid var(--primary-light);
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1rem;
+        }
+
+        /* Weather Card */
+        .weather-card {
+            background: linear-gradient(135deg, #2c9e5a, #3a7bd5);
+            color: var(--white);
+            padding: 1.8rem;
+            border-radius: 16px;
+            margin-bottom: 1.8rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .current-weather {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .temp {
+            font-size: 2.8rem;
+            font-weight: 700;
+        }
+
+        .weather-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .weather-metric {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Forecast */
+        .forecast-container {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .forecast-day {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .forecast-day:hover {
+            background: var(--primary-light);
+            color: var(--white);
+            transform: translateY(-3px);
+        }
+
+        /* Weather input section */
+        .weather-input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .weather-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            min-width: 200px;
+            background: var(--white);
+            transition: var(--transition);
+        }
+        
+        .weather-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+        }
+        
+        .weather-btn {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: var(--white);
+            padding: 12px 25px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            min-width: 120px;
+            box-shadow: 0 4px 8px rgba(46, 125, 50, 0.3);
+        }
+        
+        .weather-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            transform: translateY(-2px);
+        }
+
+        /* Pest Detection */
+        .upload-area {
+            border: 2px dashed var(--primary-light);
+            border-radius: 16px;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            margin: 2rem 0;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(76, 175, 80, 0.05);
+            position: relative;
+        }
+
+        .upload-area:hover {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--primary);
+        }
+
+        .upload-icon {
+            font-size: 3.2rem;
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: slideUp 0.4s ease;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Market Prices */
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .price-table th {
+            background: var(--primary-light);
+            color: var(--white);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .price-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .price-table tr:hover {
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .trend-up {
+            color: #2E7D32;
+            font-weight: 600;
+        }
+
+        .trend-down {
+            color: #f44336;
+            font-weight: 600;
+        }
+
+        .trend-stable {
+            color: #FF9800;
+            font-weight: 600;
+        }
+
+        /* Schemes */
+        .scheme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .scheme-card {
+            background: linear-gradient(135deg, #5a8f69, #3a7bd5);
+            color: var(--white);
+            padding: 1.6rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scheme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .scheme-card h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Expense Tracker */
+        .expense-form {
+            background: var(--light);
+            padding: 1.8rem;
+            border-radius: 16px;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: var(--white);
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(46, 125, 50, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(46, 125, 50, 0.35);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin: 2rem 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--secondary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: #e0f7fa;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .footer-section a:hover {
+            color: var(--secondary);
+            transform: translateX(5px);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(40px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .language-switcher {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .nav-tab {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .weather-header {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .current-weather {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .weather-input-section {
+                flex-direction: column;
+            }
+            
+            .weather-btn {
+                width: 100%;
+            }
+            
+            .feature-grid, .scheme-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Saikiran(AgroSakha)</h1>
+                        <p>AI Farming Assistant for Indian Farmers</p>
+                    </div>
+                </div>
+                
+                <div class="language-switcher">
+                    <button class="lang-btn">Telugu</button>
+                    <button class="lang-btn active">English</button>
+                    <button class="lang-btn">Hindi</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('dashboard')">
+                <i class="fas fa-home"></i> Dashboard
+            </div>
+            <div class="nav-tab" onclick="showTab('weather')">
+                <i class="fas fa-cloud-sun"></i> Weather
+            </div>
+            <div class="nav-tab" onclick="showTab('pest')">
+                <i class="fas fa-bug"></i> Pest Detection
+            </div>
+            <div class="nav-tab" onclick="showTab('market')">
+                <i class="fas fa-rupee-sign"></i> Market Prices
+            </div>
+            <div class="nav-tab" onclick="showTab('schemes')">
+                <i class="fas fa-file-alt"></i> Govt Schemes
+            </div>
+            <div class="nav-tab" onclick="showTab('expenses')">
+                <i class="fas fa-calculator"></i> Expense Tracker
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="content-card">
+                <h2 class="section-title">🏠 Dashboard</h2>
+                
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Hello saikiran!</strong> Your daily farming advice is here.
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3><span class="feature-icon"><i class="fas fa-cloud-sun"></i></span> Today's Weather</h3>
+                        <p><strong>Vijayawada:</strong> 28°C, 75% Humidity</p>
+                        <p><strong>Conditions:</strong> Partly Cloudy</p>
+                        <p class="trend-up">✅ Suitable for spraying</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3><span class="feature-icon"><i class="fas fa-rupee-sign"></i></span> Market Prices</h3>
+                        <p><strong>Rice:</strong> ₹2,485 / Quintal</p>
+                        <p><strong>Cotton:</strong> ₹6,742 / Quintal</p>
+                        <p class="trend-up">📈 Prices rising</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3><span class="feature-icon"><i class="fas fa-tractor"></i></span> Daily Farming Tip</h3>
+                        <p><strong>Today:</strong> Ideal day for urea application in paddy crops</p>
+                        <p><strong>Advice:</strong> Apply between 6-8 AM</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3><span class="feature-icon"><i class="fas fa-calendar-alt"></i></span> Active Schemes</h3>
+                        <p><strong>PM-KISAN:</strong> Next installment March 2025</p>
+                        <p><strong>Crop Insurance:</strong> Rates available</p>
+                        <p class="trend-stable">🔔 Apply now</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h2 class="section-title">📅 This Week's Farming Activities</h2>
+                
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Tab -->
+        <div id="weather" class="tab-content">
+            <div class="content-card">
+                <h2 class="section-title">🌤️ Weather Advisory</h2>
+                
+                <div class="weather-input-section">
+                    <input type="text" id="weatherLocation" class="weather-input" placeholder="Enter location (e.g. Vijayawada)" value="Vijayawada">
+                    <button onclick="getWeather()" class="weather-btn">
+                        <i class="fas fa-search"></i> Get Forecast
+                    </button>
+                </div>
+                
+                <div id="weatherLoader" style="display: none; text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Loading weather data...</p>
+                </div>
+                
+                <div id="weatherOutput">
+                    <!-- Weather data will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Pest Detection Tab -->
+        <div id="pest" class="tab-content">
+            <div class="content-card">
+                <h2 class="section-title">🐛 Pest & Disease Identification</h2>
+                
+                <div class="upload-area" onclick="openModal()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>📸 Upload Crop Image</h3>
+                    <p>Take a photo of your crop leaf or affected area and upload it here</p>
+                </div>
+
+                <div id="diseaseResult" class="feature-card" style="display: none;">
+                    <h3><span class="feature-icon"><i class="fas fa-diagnoses"></i></span> Analysis Result</h3>
+                    <div id="diseaseInfo"></div>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="feature-icon"><i class="fas fa-book-medical"></i></span> Common Diseases & Remedies</h3>
+                    <div style="margin-top: 1rem;">
+                        <h4>Rice Blast Disease:</h4>
+                        <p><strong>Symptoms:</strong> Diamond-shaped lesions on leaves</p>
+                        <p><strong>Remedy:</strong> Spray Tricyclazole 75% WP @ 0.6g/L</p>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <h4>Cotton Whitefly:</h4>
+                        <p><strong>Symptoms:</strong> Whiteflies under leaves</p>
+                        <p><strong>Remedy:</strong> Spray Imidacloprid 17.8% SL @ 0.3ml/L</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Prices Tab -->
+        <div id="market" class="tab-content">
+            <div class="content-card">
+                <h2 class="section-title">💰 Market Prices</h2>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Alert:</strong> Rice prices are rising this week. Good time to sell.
+                    </div>
+                </div>
+
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th>Crop</th>
+                            <th>Price (₹/Quintal)</th>
+                            <th>Trend</th>
+                            <th>Market</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priceTableBody"></tbody>
+                </table>
+
+                <div class="chart-container">
+                    <h3>📈 Price Forecast - Rice (30 Days)</h3>
+                    <canvas id="priceChart"></canvas>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="feature-icon"><i class="fas fa-store"></i></span> Nearby Markets</h3>
+                    <div style="margin-top: 1rem;">
+                        <h4>Vijayawada Agricultural Market:</h4>
+                        <p><strong>Distance:</strong> 2 km | <strong>Phone:</strong> +91-9876543210</p>
+                        <p><strong>Specialties:</strong> Rice, Cotton, Vegetables</p>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <h4>Guntur Chili Yard:</h4>
+                        <p><strong>Distance:</strong> 45 km | <strong>Phone:</strong> +91-9876543211</p>
+                        <p><strong>Specialties:</strong> Chilies, Turmeric, Cotton</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Government Schemes Tab -->
+        <div id="schemes" class="tab-content">
+            <div class="content-card">
+                <h2 class="section-title">📋 Government Schemes</h2>
+                
+                <div class="scheme-grid">
+                    <div class="scheme-card">
+                        <h3><i class="fas fa-hand-holding-usd"></i> PM-KISAN Samman Nidhi</h3>
+                        <p><strong>Description:</strong> ₹6,000 annually for small farmers</p>
+                        <p><strong>Eligibility:</strong> Small & marginal farmers up to 2 hectares</p>
+                        <p><strong>Benefits:</strong> ₹2,000 per installment, 3 times a year</p>
+                        <p><strong>Required Documents:</strong> Aadhaar, Bank Account, Land Records</p>
+                        <button class="btn" onclick="generateForm('pm_kisan')">
+                            <i class="fas fa-file-download"></i> Download Form
+                        </button>
+                    </div>
+
+                    <div class="scheme-card">
+                        <h3><i class="fas fa-shield-alt"></i> Pradhan Mantri Fasal Bima Yojana</h3>
+                        <p><strong>Description:</strong> Crop insurance against natural calamities</p>
+                        <p><strong>Eligibility:</strong> All farmers including sharecroppers</p>
+                        <p><strong>Benefits:</strong> Up to 100% compensation for crop loss</p>
+                        <p><strong>Required Documents:</strong> Aadhaar, Bank Account, Land Records, Seed Certificate</p>
+                        <button class="btn" onclick="generateForm('crop_insurance')">
+                            <i class="fas fa-file-download"></i> Download Form
+                        </button>
+                    </div>
+
+                    <div class="scheme-card">
+                        <h3><i class="fas fa-vial"></i> Soil Health Card Scheme</h3>
+                        <p><strong>Description:</strong> Free soil testing and health cards</p>
+                        <p><strong>Eligibility:</strong> All farmers</p>
+                        <p><strong>Benefits:</strong> Free soil tests, nutrient recommendations</p>
+                        <p><strong>Required Documents:</strong> Aadhaar, Land Records</p>
+                        <button class="btn" onclick="generateForm('soil_health')">
+                            <i class="fas fa-file-download"></i> Download Form
+                        </button>
+                    </div>
+                </div>
+
+                <div id="generatedForm" class="feature-card" style="display: none; margin-top: 2rem;">
+                    <h3><span class="feature-icon"><i class="fas fa-file-pdf"></i></span> Application Form</h3>
+                    <div id="formContent"></div>
+                    <button class="btn" style="margin-top: 1rem;">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expenses Tab -->
+        <div id="expenses" class="tab-content">
+            <div class="content-card">
+                <h2 class="section-title">📊 Expense Tracker</h2>
+                
+                <div class="expense-form">
+                    <h3>💸 Record Daily Expenses</h3>
+                    <form id="expenseForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expenseDate">Date:</label>
+                                <input type="date" id="expenseDate" name="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseCategory">Category:</label>
+                                <select id="expenseCategory" name="category" required>
+                                    <option value="">Select</option>
+                                    <option value="seeds">Seeds</option>
+                                    <option value="fertilizer">Fertilizers</option>
+                                    <option value="pesticides">Pesticides</option>
+                                    <option value="labor">Labor</option>
+                                    <option value="fuel">Fuel</option>
+                                    <option value="equipment">Equipment</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expenseAmount">Amount (₹):</label>
+                                <input type="number" id="expenseAmount" name="amount" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseDescription">Description:</label>
+                                <textarea id="expenseDescription" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-plus-circle"></i> Add Expense
+                        </button>
+                    </form>
+                </div>
+
+                <div class="chart-container">
+                    <h3>📈 Monthly Expense Summary</h3>
+                    <canvas id="expenseChart"></canvas>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="feature-icon"><i class="fas fa-chart-pie"></i></span> Total Expense Summary</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(46, 125, 50, 0.1); border-radius: 10px;">
+                            <h4>This Month Total</h4>
+                            <p style="font-size: 1.8rem; color: var(--primary);">₹25,450</p>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255, 152, 0, 0.1); border-radius: 10px;">
+                            <h4>Highest Expense</h4>
+                            <p style="font-size: 1.8rem; color: #FF9800;">Fertilizers</p>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(33, 150, 243, 0.1); border-radius: 10px;">
+                            <h4>Estimated Profit</h4>
+                            <p style="font-size: 1.8rem; color: #2196F3;">₹75,000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pest Detection Modal -->
+    <div class="modal" id="pestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload Crop Image</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" onclick="document.getElementById('imageUpload').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Select an Image</h3>
+                    <p>Click here or drag an image to upload</p>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="analyzeImage()">
+                </div>
+                
+                <div id="imagePreview" style="display: none; margin-top: 1.5rem; text-align: center;">
+                    <img id="previewImg" style="max-width: 100%; max-height: 300px; border-radius: 12px;">
+                </div>
+                
+                <div id="modalDiseaseInfo" style="display: none; margin-top: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">Analysis Result</h3>
+                    <div id="modalDiseaseContent"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About AgroSakha</h3>
+                    <p>AI-powered farming assistant providing modern technology solutions to Indian farmers.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Useful Links</h3>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-arrow-right"></i> Agriculture Department</a></li>
+                        <li><a href="#"><i class="fas fa-arrow-right"></i> Krishi Radio</a></li>
+                        <li><a href="#"><i class="fas fa-arrow-right"></i> Market Prices</a></li>
+                        <li><a href="#"><i class="fas fa-arrow-right"></i> Weather Forecasts</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+91 98765 43210</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>support@agrosakha.in</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>WhatsApp: +91 98765 43210</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Vijayawada, Andhra Pradesh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 AgroSakha. All rights reserved.</p>
+                <p>In collaboration with the Ministry of Agriculture & Farmers Welfare, Govt of India</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching function
+        function showTab(tabId) {
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to the clicked tab
+            event.currentTarget.classList.add('active');
+            
+            // Load weather when weather tab is shown
+            if(tabId === 'weather') {
+                getWeather();
+            }
+        }
+        
+        // Modal functions
+        function openModal() {
+            document.getElementById('pestModal').classList.add('active');
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('modalDiseaseInfo').style.display = 'none';
+        }
+        
+        function closeModal() {
+            document.getElementById('pestModal').classList.remove('active');
+        }
+        
+        // Initialize market prices
+        function initPrices() {
+            const priceData = [
+                { crop: 'Rice', price: 2485, trend: 'up', market: 'Vijayawada' },
+                { crop: 'Cotton', price: 6742, trend: 'up', market: 'Guntur' },
+                { crop: 'Pulses', price: 8120, trend: 'stable', market: 'Chilakaluripet' },
+                { crop: 'Chilies', price: 12500, trend: 'down', market: 'Guntur' },
+                { crop: 'Potato', price: 1850, trend: 'up', market: 'Vijayawada' },
+                { crop: 'Tomato', price: 3200, trend: 'stable', market: 'Chilakaluripet' }
+            ];
+            
+            const tableBody = document.getElementById('priceTableBody');
+            tableBody.innerHTML = '';
+            
+            priceData.forEach(item => {
+                const row = document.createElement('tr');
+                let trendClass = '';
+                let trendIcon = '';
+                
+                if (item.trend === 'up') {
+                    trendClass = 'trend-up';
+                    trendIcon = '📈';
+                } else if (item.trend === 'down') {
+                    trendClass = 'trend-down';
+                    trendIcon = '📉';
+                } else {
+                    trendClass = 'trend-stable';
+                    trendIcon = '↔️';
+                }
+                
+                row.innerHTML = `
+                    <td>${item.crop}</td>
+                    <td>₹${item.price.toLocaleString('en-IN')}</td>
+                    <td class="${trendClass}">${trendIcon} ${item.trend === 'up' ? 'Rising' : item.trend === 'down' ? 'Falling' : 'Stable'}</td>
+                    <td>${item.market}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Generate form for schemes
+        function generateForm(scheme) {
+            const formContent = document.getElementById('formContent');
+            const generatedForm = document.getElementById('generatedForm');
+            
+            let formHTML = '';
+            
+            if (scheme === 'pm_kisan') {
+                formHTML = `
+                    <p><strong>Scheme:</strong> PM-KISAN Samman Nidhi</p>
+                    <p><strong>Application No:</strong> AGRO-PMKS-2025-${Math.floor(1000 + Math.random() * 9000)}</p>
+                    <div style="margin: 1rem 0; padding: 1rem; background: rgba(46, 125, 50, 0.1); border-radius: 10px;">
+                        <p>Please fill in your details:</p>
+                        <p>1. Farmer Name: ________________</p>
+                        <p>2. Aadhaar No: ________________</p>
+                        <p>3. Bank Account Details: ________________</p>
+                        <p>4. Land Details: ________________</p>
+                    </div>
+                `;
+            } else if (scheme === 'crop_insurance') {
+                formHTML = `
+                    <p><strong>Scheme:</strong> Pradhan Mantri Fasal Bima Yojana</p>
+                    <p><strong>Application No:</strong> AGRO-CINS-2025-${Math.floor(1000 + Math.random() * 9000)}</p>
+                    <div style="margin: 1rem 0; padding: 1rem; background: rgba(46, 125, 50, 0.1); border-radius: 10px;">
+                        <p>Please fill in your details:</p>
+                        <p>1. Farmer Name: ________________</p>
+                        <p>2. Crop Name: ________________</p>
+                        <p>3. Land Details: ________________</p>
+                        <p>4. Seed Certificate No: ________________</p>
+                    </div>
+                `;
+            } else {
+                formHTML = `
+                    <p><strong>Scheme:</strong> Soil Health Card Scheme</p>
+                    <p><strong>Application No:</strong> AGRO-SOIL-2025-${Math.floor(1000 + Math.random() * 9000)}</p>
+                    <div style="margin: 1rem 0; padding: 1rem; background: rgba(46, 125, 50, 0.1); border-radius: 10px;">
+                        <p>Please fill in your details:</p>
+                        <p>1. Farmer Name: ________________</p>
+                        <p>2. Aadhaar No: ________________</p>
+                        <p>3. Land Details: ________________</p>
+                        <p>4. Crop Details: ________________</p>
+                    </div>
+                `;
+            }
+            
+            formContent.innerHTML = formHTML;
+            generatedForm.style.display = 'block';
+            generatedForm.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Analyze uploaded image
+        function analyzeImage() {
+            const fileInput = document.getElementById('imageUpload');
+            const previewImg = document.getElementById('previewImg');
+            const imagePreview = document.getElementById('imagePreview');
+            const modalDiseaseInfo = document.getElementById('modalDiseaseInfo');
+            const modalDiseaseContent = document.getElementById('modalDiseaseContent');
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    
+                    // Show loading state
+                    modalDiseaseInfo.style.display = 'block';
+                    modalDiseaseContent.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Analyzing image...</p>';
+                    
+                    // Simulate AI analysis
+                    setTimeout(() => {
+                        const diseases = [
+                            { name: "Rice Blast Disease", accuracy: "92%", solution: "Spray Tricyclazole 75% WP @ 0.6g/L" },
+                            { name: "Cotton Whitefly", accuracy: "87%", solution: "Spray Imidacloprid 17.8% SL @ 0.3ml/L" },
+                            { name: "Tomato Leaf Curl Virus", accuracy: "78%", solution: "Improve water management and spray Imidacloprid" }
+                        ];
+                        
+                        const randomDisease = diseases[Math.floor(Math.random() * diseases.length)];
+                        
+                        modalDiseaseContent.innerHTML = `
+                            <div style="margin-bottom: 1rem;">
+                                <h4>Identified Disease:</h4>
+                                <p>${randomDisease.name} (Accuracy: ${randomDisease.accuracy})</p>
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <h4>Remedial Actions:</h4>
+                                <p>${randomDisease.solution}</p>
+                            </div>
+                            <div>
+                                <h4>Additional Advice:</h4>
+                                <p>Remove affected plant parts to prevent further spread. 
+                                Apply pesticides in the morning or evening.</p>
+                            </div>
+                        `;
+                    }, 2000);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Initialize charts
+        function initCharts() {
+            // Activity Chart
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Iron Application', 'Irrigation', 'Weeding', 'Pesticide Spray', 'Harvesting', 'Fertilizers'],
+                    datasets: [{
+                        label: 'Days to Complete',
+                        data: [3, 1, 2, 5, 15, 7],
+                        backgroundColor: [
+                            'rgba(76, 175, 80, 0.7)',
+                            'rgba(33, 150, 243, 0.7)',
+                            'rgba(255, 152, 0, 0.7)',
+                            'rgba(156, 39, 176, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(46, 125, 50, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Farming Activity Schedule'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Price Chart
+            const priceCtx = document.getElementById('priceChart').getContext('2d');
+            new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '5', '10', '15', '20', '25', '30'],
+                    datasets: [{
+                        label: 'Rice Price (₹/Quintal)',
+                        data: [2350, 2400, 2420, 2450, 2500, 2485, 2550],
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '30-Day Rice Price Forecast'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Price (₹)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Days'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Expense Chart
+            const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+            new Chart(expenseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Seeds', 'Fertilizers', 'Pesticides', 'Labor', 'Fuel', 'Other'],
+                    datasets: [{
+                        label: 'Expenses (₹)',
+                        data: [3500, 8500, 4200, 6000, 1800, 1450],
+                        backgroundColor: [
+                            'rgba(76, 175, 80, 0.7)',
+                            'rgba(33, 150, 243, 0.7)',
+                            'rgba(255, 152, 0, 0.7)',
+                            'rgba(156, 39, 176, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(46, 125, 50, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Expense Breakdown'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize date field with today's date
+        function initDateField() {
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('expenseDate').value = formattedDate;
+        }
+        
+        // Handle expense form submission
+        function handleExpenseForm(e) {
+            e.preventDefault();
+            
+            const category = document.getElementById('expenseCategory').value;
+            const amount = document.getElementById('expenseAmount').value;
+            
+            if (category && amount) {
+                alert(`Expense recorded!\nCategory: ${category}\nAmount: ₹${amount}`);
+                document.getElementById('expenseForm').reset();
+                initDateField();
+            }
+        }
+        
+        // Get weather emoji based on description
+        function getWeatherEmoji(desc) {
+            const lower = desc.toLowerCase();
+            if (lower.includes("rain")) return "🌧️";
+            if (lower.includes("cloud")) return "⛅";
+            if (lower.includes("sun")) return "☀️";
+            if (lower.includes("clear")) return "🌤️";
+            if (lower.includes("thunder")) return "⛈️";
+            return "🌡️";
+        }
+        
+        // Get weather data
+        async function getWeather() {
+            const place = document.getElementById("weatherLocation").value.trim();
+            if (!place) return alert("Please enter a location.");
+            
+            const loader = document.getElementById('weatherLoader');
+            const output = document.getElementById('weatherOutput');
+            
+            loader.style.display = 'block';
+            output.innerHTML = '';
+            
+            try {
+                // Simulated weather data since API might have CORS issues
+                const weatherData = {
+                    current_condition: [{
+                        temp_C: "28",
+                        humidity: "75",
+                        weatherDesc: [{ value: "Partly cloudy" }],
+                        windspeedKmph: "15",
+                        precipMM: "0",
+                        observation_time: "10:30 AM"
+                    }],
+                    weather: [
+                        {
+                            date: "2025-07-21",
+                            astronomy: [{ sunrise: "05:42 AM" }],
+                            maxtempC: "32",
+                            mintempC: "26",
+                            hourly: [{
+                                precipMM: "0"
+                            }]
+                        },
+                        {
+                            date: "2025-07-22",
+                            astronomy: [{ sunrise: "05:43 AM" }],
+                            maxtempC: "33",
+                            mintempC: "27",
+                            hourly: [{
+                                precipMM: "0.2"
+                            }]
+                        },
+                        {
+                            date: "2025-07-23",
+                            astronomy: [{ sunrise: "05:43 AM" }],
+                            maxtempC: "31",
+                            mintempC: "25",
+                            hourly: [{
+                                precipMM: "1.5"
+                            }]
+                        }
+                    ]
+                };
+                
+                const current = weatherData.current_condition[0];
+                const forecast = weatherData.weather;
+                
+                let outputHTML = `
+                    <div class="weather-card">
+                        <div class="weather-header">
+                            <div class="current-weather">
+                                <div>
+                                    <div class="temp">${current.temp_C}°C</div>
+                                    <div><strong>${place}</strong></div>
+                                </div>
+                                <div>
+                                    <span style="font-size: 4rem;">${getWeatherEmoji(current.weatherDesc[0].value)}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p>Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                <p>Time: ${current.observation_time}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Weather Advisory:</strong> ${parseInt(current.windspeedKmph) > 20 ? 
+                                    `High wind speed (${current.windspeedKmph} km/h) - not suitable for spraying` : 
+                                    parseInt(current.precipMM) > 0 ? 
+                                    `Rain expected (${current.precipMM} mm) - avoid spraying` : 
+                                    `Suitable for spraying - low wind and no rain expected`}
+                            </div>
+                        </div>
+                        
+                        <div class="weather-info">
+                            <div class="weather-metric">
+                                <h4>💧 Humidity</h4>
+                                <p>${current.humidity}%</p>
+                            </div>
+                            <div class="weather-metric">
+                                <h4>💨 Wind Speed</h4>
+                                <p>${current.windspeedKmph} km/h</p>
+                            </div>
+                            <div class="weather-metric">
+                                <h4>🌧️ Rainfall</h4>
+                                <p>${current.precipMM} mm</p>
+                            </div>
+                            <div class="weather-metric">
+                                <h4>🌅 Sunrise</h4>
+                                <p>${forecast[0].astronomy[0].sunrise}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="forecast-container">
+                        <h3>3-Day Weather Forecast</h3>
+                        <div class="forecast-grid">
+                `;
+                
+                forecast.forEach((day, i) => {
+                    const date = new Date(day.date);
+                    const label = i === 0 ? "Today" : i === 1 ? "Tomorrow" : 
+                                date.toLocaleDateString('en-US', { weekday: 'short' });
+                    const emoji = getWeatherEmoji(day.weatherDesc || "Partly cloudy");
+                    
+                    outputHTML += `
+                        <div class="forecast-day">
+                            <div style="font-weight: 600;">${label}</div>
+                            <div style="font-size: 1.5rem; margin: 5px 0;">${emoji}</div>
+                            <div>${day.maxtempC}°C / ${day.mintempC}°C</div>
+                            <div>🌧️ ${day.hourly[0].precipMM} mm</div>
+                        </div>
+                    `;
+                });
+                
+                outputHTML += `
+                        </div>
+                    </div>
+                `;
+                
+                output.innerHTML = outputHTML;
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+                output.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Error:</strong> Failed to fetch weather data. Please try again later.
+                        </div>
+                    </div>
+                `;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Initialize the application
+        window.onload = function() {
+            initPrices();
+            initCharts();
+            initDateField();
+            
+            // Add event listener for expense form
+            document.getElementById('expenseForm').addEventListener('submit', handleExpenseForm);
+            
+            // Load weather for default location
+            getWeather();
+        };
+    </script>
+</body>
+</html>

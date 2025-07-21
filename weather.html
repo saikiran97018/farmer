@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌤️ Weather Advisory</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .weather-box {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    .forecast {
+      margin-top: 20px;
+    }
+    .day {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #ccc;
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="weather-box">
+    <h2>🌤️ Weather Advisory</h2>
+    <input type="text" id="location" placeholder="Enter location (e.g. Vijayawada)">
+    <button onclick="getWeather()">Get Forecast</button>
+    <div id="output" class="forecast"></div>
+  </div>
+
+  <script>
+    async function getWeather() {
+      const place = document.getElementById("location").value.trim();
+      if (!place) return alert("Please enter a location.");
+
+      const res = await fetch(`https://wttr.in/${place}?format=j1`);
+      const data = await res.json();
+
+      const current = data.current_condition[0];
+      const forecast = data.weather;
+
+      let output = `
+        <p><strong>${place}</strong></p>
+        <p>🌡️ ${current.temp_C}°C</p>
+        <p>💧 Humidity: ${current.humidity}%</p>
+        <p>💨 Wind: ${current.windspeedKmph} km/h</p>
+        <p>🌧️ Rainfall: ${current.precipMM} mm</p>
+        <p>🌅 Sunrise: ${forecast[0].astronomy[0].sunrise}</p>
+        <h3>3-Day Forecast</h3>
+      `;
+
+      forecast.forEach((day, i) => {
+        const date = new Date(day.date);
+        const label = i === 0 ? "Today" : i === 1 ? "Tomorrow" : `Day ${i+1}`;
+        const emoji = getWeatherEmoji(day.hourly[4].weatherDesc[0].value);
+
+        output += `
+          <div class="day">
+            <span>${label}</span>
+            <span>${emoji} ${day.maxtempC}°C / ${day.mintempC}°C</span>
+            <span>🌧️ ${day.hourly[4].precipMM} mm</span>
+          </div>
+        `;
+      });
+
+      document.getElementById("output").innerHTML = output;
+    }
+
+    function getWeatherEmoji(desc) {
+      const lower = desc.toLowerCase();
+      if (lower.includes("rain")) return "🌧️";
+      if (lower.includes("cloud")) return "⛅";
+      if (lower.includes("sun")) return "☀️";
+      if (lower.includes("clear")) return "🌤️";
+      if (lower.includes("thunder")) return "⛈️";
+      return "🌡️";
+    }
+  </script>
+</body>
+</html>
